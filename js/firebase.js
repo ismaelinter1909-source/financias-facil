@@ -10,9 +10,14 @@ import {
     signOut
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
+
 import {
-    getFirestore
+    getFirestore,
+    doc,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyBz-ae5JeFByZnAaruqsWTpwSneaHlq0is",
@@ -63,6 +68,8 @@ onAuthStateChanged(auth, (user) => {
 
         console.log("Usuário logado:", user.displayName);
 
+        testarFirestore(user);
+
         if (nomeUsuario) {
             nomeUsuario.textContent = `Olá, ${user.displayName} 👋`;
         }
@@ -90,4 +97,26 @@ onAuthStateChanged(auth, (user) => {
         }
     }
 });
+
+async function testarFirestore(user) {
+
+    try {
+
+        await setDoc(
+            doc(db, "usuarios", user.uid),
+            {
+                nome: user.displayName,
+                email: user.email,
+                ultimoLogin: new Date().toISOString()
+            }
+        );
+
+        console.log("Firestore funcionando!");
+
+    } catch (erro) {
+
+        console.error("Erro Firestore:", erro);
+
+    }
+}
 

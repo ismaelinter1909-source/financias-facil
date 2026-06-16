@@ -1,7 +1,12 @@
+import { auth, db } from "./firebase.js";
+
+import {
+    collection,
+    addDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 const formReceita = document.getElementById("formReceita");
 
-formReceita.addEventListener("submit", function(event) {
-
+formReceita.addEventListener("submit", async function(event) {
     event.preventDefault();
 
     const receita = {
@@ -11,15 +16,17 @@ formReceita.addEventListener("submit", function(event) {
     origem: document.getElementById("origemReceita").value,
     valor: Number(document.getElementById("valorReceita").value)
 };
-    let receitas =
-        JSON.parse(localStorage.getItem("receitas")) || [];
+    const user = auth.currentUser;
 
-    receitas.push(receita);
+if (!user) {
+    alert("Faça login primeiro.");
+    return;
+}
 
-    localStorage.setItem(
-        "receitas",
-        JSON.stringify(receitas)
-    );
+await addDoc(
+    collection(db, "usuarios", user.uid, "receitas"),
+    receita
+);
 
     alert("Receita salva com sucesso!");
 
