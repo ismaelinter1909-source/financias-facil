@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <title>Finanças</title>
+</head>
+<body>
+    <header class="topo">
+    <img src="img/APP-FINANCIAS.PNG.png" alt="Finanças Fácil" class="logo">
+    <h1>Finanças Fácil</h1>
+</header>
+<div id="areaUsuario" style="text-align:center; margin:10px;">
+    <button id="btnLoginGoogle">
+        Entrar com Google
+    </button>
+<button id="btnLogout">
+    🚪 Sair
+</button>
+
+<h3 id="nomeUsuario"></h3>
+
+    <h3 id="nomeUsuario"></h3>
+</div>
+<nav>
+
+    <button onclick="mostrarSecao('dashboard')">
+        Dashboard
+    </button>
+
+    <button onclick="mostrarSecao('receitas')">
+        Receitas
+    </button>
+
+    <button onclick="mostrarSecao('gastos')">
+        Gastos
+    </button>
+
+    <button onclick="mostrarSecao('historico')">
+        Histórico
+    </button>
+    <button id="btnExportar">
+    💾 Exportar Backup
+</button>
+
+<button id="btnImportar">
+    📂 Importar Backup
+</button>
+
+<input
+    type="file"
+    id="arquivoBackup"
+    accept=".json"
+    style="display:none">
+
+</nav>
+
+<main>
+
+<section id="dashboard">
+
+    <h2>Resumo do Mês</h2>
+    <div class="filtro-mes">
+
+    <label for="mesSelecionado">
+        Mês:
+    </label>
+
+    <input type="month" id="mesSelecionado">
+
+</div>
+
+    <div class="cards">
+
+        <div class="cards">
+
+    <div class="card receita">
+        <h3>Receitas</h3>
+        <p id="totalReceitas">R$ 0,00</p>
+    </div>
+
+    <div class="card gasto">
+        <h3>Gastos</h3>
+        <p id="totalGastos">R$ 0,00</p>
+    </div>
+
+    <div class="card saldo">
+        <h3>Saldo</h3>
+        <p id="saldoAtual">R$ 0,00</p>
+    </div>
+
+    <div class="card lancamentos">
+        <h3>Lançamentos</h3>
+        <p id="totalLancamentos">0</p>
+    </div>
+
+    <button id="btnRelatorio" class="btn-relatorio">
+    📄 Gerar Relatório PDF
+</button>
+    <div class="grafico-container">
+
+    <h3>Gastos por Categoria</h3>
+
+    <canvas id="graficoGastos"></canvas>
+
+</div>
+
+
+</section>
+
+<section id="receitas">
+
+    <h2>Cadastro de Receitas</h2>
+
+    <form id="formReceita">
+
+        <div>
+            <label for="dataReceita">Data:</label>
+            <input type="date" id="dataReceita" required>
+        </div>
+
+        <div>
+            <label for="origemReceita">Origem:</label>
+            <input type="text" id="origemReceita" placeholder="Ex: Salário" required>
+        </div>
+
+        <div>
+            <label for="valorReceita">Valores:</label>
+            <input type="number" id="valorReceita" step="0.01" placeholder="0,00" required>
+        </div>
+
+        <button type="submit">Salvar Receita</button>
+
+    </form>
+
+    <h3>Receitas Cadastradas</h3>
+
+<div id="listaReceitas">
+
+</div>
+
+</section>
+
+<section id="gastos">
+
+    <h2>Cadastro de Gastos</h2>
+
+    <form id="formGasto">
+
+        <div>
+            <label>Data:</label>
+            <input type="date" id="dataGasto" required>
+        </div>
+
+        <div>
+            <label>Categoria:</label>
+
+            <select id="categoriaGasto" required>
+                <option value="">Selecione</option>
+                <option>Aluguel</option>
+                <option>Carro</option>
+                <option>Mercado</option>
+                <option>Farmácia</option>
+                <option>Água</option>
+                <option>Luz</option>
+                <option>Internet</option>
+                <option>Cursos</option>
+                <option>Gasolina</option>
+                <option>Lazer</option>
+                <option>Lanches</option>
+                <option>Lojas</option>
+                <option>Diversos</option>
+            </select>
+
+        </div>
+
+        <div>
+            <label>Pagamento:</label>
+
+            <select id="pagamentoGasto" required>
+                <option value="">Selecione</option>
+                <option>Pix</option>
+                <option>Débito</option>
+                <option>Crédito</option>
+                <option>Dinheiro</option>
+            </select>
+
+        </div>
+
+        <div>
+            <label>Valores:</label>
+            <input type="number" id="valorGasto" step="0.01" required>
+        </div>
+
+        <button type="submit">Salvar Gasto</button>
+
+    </form>
+
+    <h3>Gastos Cadastrados</h3>
+
+    <div id="listaGastos"></div>
+
+</section>
+
+<section id="historico">
+
+    <h2>Histórico Geral</h2>
+
+    <div id="listaHistorico"></div>
+
+</section>
+
+</main>
+<script src="js/dashboard.js"></script>
+<script src="js/app.js"></script>
+<script src="js/receitas.js"></script>
+<script src="js/gastos.js"></script>
+<script src="js/historico.js"></script>
+<script src="js/grafico.js"></script><script src="js/relatorio.js"></script>
+
+<script src="js/backup.js"></script>
+<script type="module" src="js/firebase.js"></script>
+</html>
