@@ -2,7 +2,8 @@ import { auth, db } from "./firebase.js";
 
 import {
     collection,
-    addDoc
+    addDoc,
+    getDocs
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 const formReceita = document.getElementById("formReceita");
 
@@ -29,6 +30,7 @@ await addDoc(
 );
 
     alert("Receita salva com sucesso!");
+    await testarLeituraReceitas();
 
     formReceita.reset();
 
@@ -39,56 +41,64 @@ await addDoc(
         atualizarHistorico();
     }
 });
-function atualizarResumo() {
+async function atualizarResumo() {
 
-    const receitasTodas =
-        JSON.parse(localStorage.getItem("receitas")) || [];
+    const user = auth.currentUser;
 
-    const mesAtual =
-        document.getElementById("mesSelecionado").value;
+    if (!user) return;
 
-    const receitas =
-        receitasTodas.filter(receita =>
-            receita.data.startsWith(mesAtual)
-        );
-
-    const totalReceitas = receitas.reduce(
-        (total, receita) => total + receita.valor,
-        0
+    const snapshot = await getDocs(
+        collection(db, "usuarios", user.uid, "receitas")
     );
+
+    let totalReceitas = 0;
+
+    snapshot.forEach((doc) => {
+        totalReceitas += doc.data().valor;
+    });
+
+    console.log("TOTAL DASHBOARD:", totalReceitas);
 
     document.getElementById("totalReceitas").textContent =
         totalReceitas.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL"
         });
-
-    if (typeof atualizarSaldo === "function") {
-        atualizarSaldo();
-    }
 }
 
-function exibirReceitas() {
 
+ async function exibirReceitas() {
 
     const listaReceitas =
         document.getElementById("listaReceitas");
 
-    const receitasTodas =
-        JSON.parse(localStorage.getItem("receitas")) || [];
+        const user = auth.currentUser;
+
+if (!user) return;
+        
+    const snapshot = await getDocs(
+        collection(db, "usuarios", user.uid, "receitas")
+    );
+
+    const receitas = [];
+
+  snapshot.forEach((doc) => {
+    receitas.push({
+        firestoreId: doc.id,
+        ...doc.data()
+    });
+});
 
     const mesAtual =
-        document.getElementById("mesSelecionado").value;
-       
+    document.getElementById("mesSelecionado").value;
 
-    const receitas =
-        receitasTodas.filter(receita =>
-            receita.data.startsWith(mesAtual)
-        );
+const receitasFiltradas = receitas.filter(receita =>
+    receita.data.startsWith(mesAtual)
+);
 
-    listaReceitas.innerHTML = "";
+listaReceitas.innerHTML = "";
 
-    receitas.forEach((receita, index) => {
+   receitasFiltradas.forEach((receita, index) => {
 
         listaReceitas.innerHTML += `
             <div class="item-receita">
@@ -107,7 +117,7 @@ function exibirReceitas() {
 
                 <button
                     class="btn-excluir"
-                   onclick="excluirReceita(${receita.id})">
+                  onclick="excluirReceita('${receita.firestoreId}')">
                     Excluir
                 </button>
             </div>
@@ -120,16 +130,8 @@ function excluirReceita(id) {
         return;
     }
 
-    let receitas =
-        JSON.parse(localStorage.getItem("receitas")) || [];
-
     receitas = receitas.filter(
         receita => receita.id !== id
-    );
-
-    localStorage.setItem(
-        "receitas",
-        JSON.stringify(receitas)
     );
 
     atualizarResumo();
@@ -149,5 +151,62 @@ function excluirReceita(id) {
     }
 }
 
-atualizarResumo();
-exibirReceitas();
+
+async function testarLeituraReceitas() {
+
+    const user = auth.currentUser;
+
+    if (!user) return;
+
+    const snapshot = await getDocs(
+        collection(db, "usuarios", user.uid, "receitas")
+    );
+
+    let total = 0;
+const receitas = [];
+
+snapshot.forEach((doc) => {
+    const receita = doc.data();
+
+    receitas.push(receita);
+
+    total += receita.valor;
+});
+
+document.getElementById("totalReceitas").textContent =
+    total.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+
+window.receitasFirestore = receitas;
+
+}
+async function carregarReceitas() {
+
+    const user = auth.currentUser;
+
+    if (!user) return [];
+
+    const snapshot = await getDocs(
+        collection(db, "usuarios", user.uid, "receitas")
+    );
+
+    return snapshot.docs.map(doc => ({
+        firestoreId: doc.id,
+        ...doc.data()
+    }));
+}
+
+import { onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+onAuthStateChanged(auth, async (user) => {
+
+    if (!user) return;
+
+    await atualizarResumo();
+    await exibirReceitas();
+    await testarLeituraReceitas();
+
+});

@@ -1,7 +1,18 @@
+import { auth, db } from "./firebase.js";
+
+import {
+    collection,
+    getDocs,
+    addDoc,
+    deleteDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+ 
+
 const formGasto =
     document.getElementById("formGasto");
 
-formGasto.addEventListener("submit", function(event) {
+formGasto.addEventListener("submit", async function(event) {
 
     event.preventDefault();
 
@@ -13,15 +24,15 @@ formGasto.addEventListener("submit", function(event) {
     pagamento: document.getElementById("pagamentoGasto").value,
     valor: Number(document.getElementById("valorGasto").value)
 };
+    const user = auth.currentUser;
+ if (!user) {
+    alert("Usuário não logado.");
+    return;
+ }
 
-    let gastos =
-        JSON.parse(localStorage.getItem("gastos")) || [];
-
-    gastos.push(gasto);
-
-    localStorage.setItem(
-        "gastos",
-        JSON.stringify(gastos)
+    await addDoc(
+        collection(db, "usuarios", user.uid, "gastos"),
+        gasto
     );
 
     alert("Gasto salvo com sucesso!");
@@ -36,23 +47,30 @@ formGasto.addEventListener("submit", function(event) {
     }
 });
 
-function atualizarGastos() {
+async function atualizarGastos() {
 
-    const gastosTodos =
-        JSON.parse(localStorage.getItem("gastos")) || [];
+    const user = auth.currentUser;
+    if (!user) return;
 
     const mesAtual =
         document.getElementById("mesSelecionado").value;
 
-    const gastos =
-        gastosTodos.filter(gasto =>
-            gasto.data.startsWith(mesAtual)
-        );
-
-    const totalGastos = gastos.reduce(
-        (total, gasto) => total + gasto.valor,
-        0
+    const snapshotGastos = await getDocs(
+        collection(db, "usuarios", user.uid, "gastos")
     );
+
+    let totalGastos = 0;
+    let quantidade = 0;
+
+    snapshotGastos.forEach((doc) => {
+
+        const gasto = doc.data();
+
+        if (gasto.data.startsWith(mesAtual)) {
+            totalGastos += gasto.valor;
+            quantidade++;
+        }
+    });
 
     document.getElementById("totalGastos").textContent =
         totalGastos.toLocaleString("pt-BR", {
@@ -60,76 +78,83 @@ function atualizarGastos() {
             currency: "BRL"
         });
 
+    const lancamentos =
+        document.getElementById("totalLancamentos");
+
+    if (lancamentos) {
+        lancamentos.textContent = quantidade;
+    }
+
     atualizarSaldo();
 }
+async function atualizarSaldo() {
 
-function atualizarSaldo() {
+    const user = auth.currentUser;
+    if (!user) return;
 
     const mesAtual =
         document.getElementById("mesSelecionado").value;
 
-    const receitas = (
-        JSON.parse(localStorage.getItem("receitas")) || []
-    ).filter(receita =>
-        receita.data.startsWith(mesAtual)
+    const snapshotReceitas = await getDocs(
+        collection(db, "usuarios", user.uid, "receitas")
     );
 
-    const gastos = (
-        JSON.parse(localStorage.getItem("gastos")) || []
-    ).filter(gasto =>
-        gasto.data.startsWith(mesAtual)
+    const snapshotGastos = await getDocs(
+        collection(db, "usuarios", user.uid, "gastos")
     );
 
-    const totalReceitas = receitas.reduce(
-        (total, receita) => total + receita.valor,
-        0
-    );
+    let totalReceitas = 0;
 
-    const totalGastos = gastos.reduce(
-        (total, gasto) => total + gasto.valor,
-        0
-    );
+    snapshotReceitas.forEach((doc) => {
+        const receita = doc.data();
+
+        if (receita.data.startsWith(mesAtual)) {
+            totalReceitas += receita.valor;
+        }
+    });
+
+    let totalGastos = 0;
+
+    snapshotGastos.forEach((doc) => {
+        const gasto = doc.data();
+
+        if (gasto.data.startsWith(mesAtual)) {
+            totalGastos += gasto.valor;
+        }
+    });
 
     const saldo = totalReceitas - totalGastos;
 
-    const elementoSaldo =
-        document.getElementById("saldoAtual");
-
-    const cardSaldo =
-        document.querySelector(".saldo");
-
-    elementoSaldo.textContent =
+    document.getElementById("saldoAtual").textContent =
         saldo.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL"
         });
 
-    if (saldo < 0) {
-        cardSaldo.style.background = "#c0392b";
-    } else {
-        cardSaldo.style.background = "#f39c12";
-    }
-}
 
-function exibirGastos() {
+    async function exibirGastos() {
+
+    const user = auth.currentUser;
+    if (!user) return;
 
     const listaGastos =
         document.getElementById("listaGastos");
 
-    const gastosTodos =
-        JSON.parse(localStorage.getItem("gastos")) || [];
-
     const mesAtual =
         document.getElementById("mesSelecionado").value;
 
-    const gastos =
-        gastosTodos.filter(gasto =>
-            gasto.data.startsWith(mesAtual)
-        );
+    const snapshotGastos = await getDocs(
+        collection(db, "usuarios", user.uid, "gastos")
+    );
 
     listaGastos.innerHTML = "";
 
-    gastos.forEach((gasto, index) => {
+    snapshotGastos.forEach((doc) => {
+
+        const gasto = doc.data();
+
+        if (!gasto.data.startsWith(mesAtual))
+            return;
 
         listaGastos.innerHTML += `
             <div class="item-gasto">
@@ -150,28 +175,11 @@ function exibirGastos() {
                     currency: 'BRL'
                 })}</p>
 
-                <button
-                    class="btn-excluir"
-                    onclick="excluirGasto(${index})">
-                    Excluir
-                </button>
-
             </div>
         `;
     });
 }
-
 function excluirGasto(index) {
-
-    let gastos =
-        JSON.parse(localStorage.getItem("gastos")) || [];
-
-    gastos.splice(index, 1);
-
-    localStorage.setItem(
-        "gastos",
-        JSON.stringify(gastos)
-    );
 
     atualizarGastos();
     exibirGastos();
@@ -184,6 +192,14 @@ function excluirGasto(index) {
 }
 }
 
-atualizarGastos();
-atualizarSaldo();
-exibirGastos();
+import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+onAuthStateChanged(auth, (user) => {
+    
+    if (!user) return;
+
+    atualizarGastos();
+    atualizarSaldo();
+    exibirGastos();
+});
+}

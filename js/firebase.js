@@ -63,6 +63,7 @@ if (btnLogout) {
 }
 
 onAuthStateChanged(auth, (user) => {
+    console.log("USUÁRIO AUTH:", user);
 
     if (user) {
 
