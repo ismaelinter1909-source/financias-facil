@@ -1,9 +1,15 @@
+import { auth, db } from "./firebase.js";
+
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 const btnRelatorio =
     document.getElementById("btnRelatorio");
 
 btnRelatorio.addEventListener("click", gerarPDF);
 
-function gerarPDF() {
+async function gerarPDF() {
 
     const { jsPDF } = window.jspdf;
 
@@ -45,17 +51,44 @@ function gerarPDF() {
     const mesAtual =
         document.getElementById("mesSelecionado").value;
 
-    const receitas = (
-        JSON.parse(localStorage.getItem("receitas")) || []
-    ).filter(receita =>
-        receita.data.startsWith(mesAtual)
-    );
+    const user = auth.currentUser;
 
-    const gastos = (
-        JSON.parse(localStorage.getItem("gastos")) || []
-    ).filter(gasto =>
-        gasto.data.startsWith(mesAtual)
-    );
+if (!user) {
+    alert("Faça login primeiro.");
+    return;
+}
+
+const snapshotReceitas = await getDocs(
+    collection(db, "usuarios", user.uid, "receitas")
+);
+
+const snapshotGastos = await getDocs(
+    collection(db, "usuarios", user.uid, "gastos")
+);
+
+const receitas = [];
+
+snapshotReceitas.forEach((doc) => {
+
+    const receita = doc.data();
+
+    if (receita.data.startsWith(mesAtual)) {
+        receitas.push(receita);
+    }
+
+});
+
+const gastos = [];
+
+snapshotGastos.forEach((doc) => {
+
+    const gasto = doc.data();
+
+    if (gasto.data.startsWith(mesAtual)) {
+        gastos.push(gasto);
+    }
+
+});
 
     const totalReceitas = receitas.reduce(
         (total, receita) => total + receita.valor,

@@ -49,6 +49,9 @@ async function atualizarResumo() {
 
     if (!user) return;
 
+    const mesAtual =
+        document.getElementById("mesSelecionado").value;
+
     const snapshot = await getDocs(
         collection(db, "usuarios", user.uid, "receitas")
     );
@@ -56,7 +59,13 @@ async function atualizarResumo() {
     let totalReceitas = 0;
 
     snapshot.forEach((doc) => {
-        totalReceitas += doc.data().valor;
+
+        const receita = doc.data();
+
+        if (receita.data.startsWith(mesAtual)) {
+            totalReceitas += receita.valor;
+        }
+
     });
 
     console.log("TOTAL DASHBOARD:", totalReceitas);
@@ -67,7 +76,6 @@ async function atualizarResumo() {
             currency: "BRL"
         });
 }
-
 
  async function exibirReceitas() {
 
@@ -231,3 +239,6 @@ onAuthStateChanged(auth, async (user) => {
 
 });
 window.excluirReceita = excluirReceita;
+window.exibirReceitas = exibirReceitas;
+window.atualizarResumo = atualizarResumo;
+console.log("Receitas carregado");

@@ -10,3 +10,4 @@ function mostrarSecao(secaoId) {
 }
 
 mostrarSecao("dashboard");
+window.mostrarSecao = mostrarSecao;

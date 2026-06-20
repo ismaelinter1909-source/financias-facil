@@ -1,17 +1,37 @@
+import { auth, db } from "./firebase.js";
+
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
 console.log("Gráfico carregado");
 
 let grafico;
 
-function atualizarGrafico() {
+async function atualizarGrafico() {
 
     const mesAtual =
         document.getElementById("mesSelecionado").value;
+const user = auth.currentUser;
 
-    const gastos = (
-        JSON.parse(localStorage.getItem("gastos")) || []
-    ).filter(gasto =>
-        gasto.data.startsWith(mesAtual)
-    );
+if (!user) return;
+
+const snapshot = await getDocs(
+    collection(db, "usuarios", user.uid, "gastos")
+);
+
+const gastos = [];
+
+snapshot.forEach((doc) => {
+
+    const gasto = doc.data();
+
+    if (gasto.data.startsWith(mesAtual)) {
+        gastos.push(gasto);
+    }
+
+});
 
     const categorias = {};
 
@@ -162,4 +182,14 @@ function atualizarGrafico() {
     });
 }
 
-atualizarGrafico();
+import { onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+onAuthStateChanged(auth, async (user) => {
+
+    if (!user) return;
+
+    await atualizarGrafico();
+
+});
+window.atualizarGrafico = atualizarGrafico;

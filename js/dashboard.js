@@ -1,3 +1,10 @@
+import { auth, db } from "./firebase.js";
+
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
 const mesSelecionado =
     document.getElementById("mesSelecionado");
 
@@ -8,42 +15,93 @@ mesSelecionado.value =
         hoje.getMonth() + 1
     ).padStart(2, "0")}`;
 
-mesSelecionado.addEventListener("change", () => {
+mesSelecionado.addEventListener("change", async () => {
+if (typeof atualizarResumo === "function") {
+    await atualizarResumo();
+}
+    await atualizarGastos();
+    await atualizarSaldo();
 
-    atualizarResumo();
-    atualizarGastos();
-    atualizarSaldo();
+    if (typeof exibirReceitas === "function") {
+        await exibirReceitas();
+    }
 
-    exibirReceitas();
-    exibirGastos();
-    atualizarHistorico();
-    atualizarLancamentos();    
-    atualizarGrafico();
+    if (typeof exibirGastos === "function") {
+        await exibirGastos();
+    }
+
+    if (typeof atualizarHistorico === "function") {
+        await atualizarHistorico();
+    }
+
+    if (typeof atualizarLancamentos === "function") {
+        await atualizarLancamentos();
+    }
+
+    if (typeof atualizarGrafico === "function") {
+        await atualizarGrafico();
+    }
+
 });
 
-atualizarLancamentos();//
+async function atualizarLancamentos() {
 
-function atualizarLancamentos() {
+    const user = auth.currentUser;
+
+    if (!user) return;
 
     const mesAtual =
         document.getElementById("mesSelecionado").value;
 
-    const receitas = (
-        JSON.parse(localStorage.getItem("receitas")) || []
-    ).filter(receita =>
-        receita.data.startsWith(mesAtual)
+    const snapshotReceitas = await getDocs(
+        collection(db, "usuarios", user.uid, "receitas")
     );
 
-    const gastos = (
-        JSON.parse(localStorage.getItem("gastos")) || []
-    ).filter(gasto =>
-        gasto.data.startsWith(mesAtual)
+    const snapshotGastos = await getDocs(
+        collection(db, "usuarios", user.uid, "gastos")
     );
 
-    const total =
-        receitas.length + gastos.length;
+    let totalReceitas = 0;
+    let totalGastos = 0;
+
+    snapshotReceitas.forEach((doc) => {
+
+        const receita = doc.data();
+
+        if (receita.data.startsWith(mesAtual)) {
+            totalReceitas++;
+        }
+    });
+
+    snapshotGastos.forEach((doc) => {
+
+        const gasto = doc.data();
+
+        if (gasto.data.startsWith(mesAtual)) {
+            totalGastos++;
+        }
+    });
 
     document.getElementById(
         "totalLancamentos"
-    ).textContent = total;
+    ).textContent = totalReceitas + totalGastos;
 }
+console.log("Dashboard carregado");
+console.log("Dashboard carregado");
+
+import { onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+onAuthStateChanged(auth, async (user) => {
+
+    if (!user) return;
+
+    await atualizarLancamentos();
+
+});
+console.log("atualizarGastos:", typeof atualizarGastos);
+console.log("atualizarSaldo:", typeof atualizarSaldo);
+console.log("exibirReceitas:", typeof exibirReceitas);
+console.log("exibirGastos:", typeof exibirGastos);
+console.log("atualizarHistorico:", typeof atualizarHistorico);
+console.log("atualizarGrafico:", typeof atualizarGrafico);

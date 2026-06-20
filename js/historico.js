@@ -94,3 +94,4 @@ function atualizarHistorico() {
 }
 
 atualizarHistorico();
+window.atualizarHistorico = atualizarHistorico;

@@ -39,8 +39,13 @@ formGasto.addEventListener("submit", async function(event) {
 
     formGasto.reset();
 
-    atualizarGastos();
-    exibirGastos();
+    await atualizarGastos();
+await atualizarSaldo();
+await exibirGastos();
+
+if (typeof atualizarLancamentos === "function") {
+    await atualizarLancamentos();
+}
 
     if (typeof atualizarHistorico === "function") {
         atualizarHistorico();
@@ -78,12 +83,6 @@ async function atualizarGastos() {
             currency: "BRL"
         });
 
-    const lancamentos =
-        document.getElementById("totalLancamentos");
-
-    if (lancamentos) {
-        lancamentos.textContent = quantidade;
-    }
 
     atualizarSaldo();
 }
@@ -131,7 +130,7 @@ async function atualizarSaldo() {
             currency: "BRL"
         });
 
-
+    }
     async function exibirGastos() {
 
     const user = auth.currentUser;
@@ -151,8 +150,10 @@ async function atualizarSaldo() {
 
     snapshotGastos.forEach((doc) => {
 
-        const gasto = doc.data();
-
+        const gasto =  {
+        firestoreId: doc.id,
+        ...doc.data()
+    };
         if (!gasto.data.startsWith(mesAtual))
             return;
 
@@ -175,31 +176,78 @@ async function atualizarSaldo() {
                     currency: 'BRL'
                 })}</p>
 
+                 <button
+            class="btn-excluir"
+            onclick="excluirGasto('${gasto.firestoreId}')">
+            Excluir
+                 </button>
+
             </div>
         `;
     });
 }
-function excluirGasto(index) {
+async function excluirGasto(id) {
 
-    atualizarGastos();
-    exibirGastos();
-
-    if (typeof atualizarHistorico === "function") {
-        atualizarHistorico();
+    if (!confirm("Deseja realmente excluir este gasto?")) {
+        return;
     }
-    if (typeof atualizarGrafico === "function") {
-    atualizarGrafico();
-}
-}
 
-import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    const user = auth.currentUser;
 
-onAuthStateChanged(auth, (user) => {
-    
     if (!user) return;
 
-    atualizarGastos();
-    atualizarSaldo();
-    exibirGastos();
-});
+    try {
+
+        await deleteDoc(
+            doc(
+                db,
+                "usuarios",
+                user.uid,
+                "gastos",
+                id
+            )
+        );
+
+        await atualizarGastos();
+        await atualizarSaldo();
+        await exibirGastos();
+
+        if (typeof atualizarHistorico === "function") {
+            atualizarHistorico();
+        }
+
+        if (typeof atualizarGrafico === "function") {
+            atualizarGrafico();
+        }
+
+        if (typeof atualizarLancamentos === "function") {
+            atualizarLancamentos();
+        }
+
+        alert("Gasto excluído com sucesso!");
+
+    } catch (erro) {
+
+        console.error("Erro ao excluir gasto:", erro);
+        alert("Erro ao excluir gasto.");
+
+    }
 }
+window.excluirGasto = excluirGasto;
+import { onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+onAuthStateChanged(auth, async (user) => {
+
+    if (!user) return;
+
+    console.log("Carregando gastos...");
+
+    await atualizarGastos();
+    await atualizarSaldo();
+    await exibirGastos();
+
+});
+window.atualizarGastos = atualizarGastos;
+window.atualizarSaldo = atualizarSaldo;
+window.exibirGastos = exibirGastos;
