@@ -21,7 +21,7 @@ mesSelecionado.addEventListener("change", () => {
     atualizarGrafico();
 });
 
-atualizarLancamentos();
+atualizarLancamentos();//
 
 function atualizarLancamentos() {
 

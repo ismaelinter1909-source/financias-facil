@@ -3,10 +3,12 @@ import { auth, db } from "./firebase.js";
 import {
     collection,
     addDoc,
-    getDocs
+    getDocs,
+    deleteDoc,
+    doc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-const formReceita = document.getElementById("formReceita");
 
+const formReceita = document.getElementById("formReceita");
 formReceita.addEventListener("submit", async function(event) {
     event.preventDefault();
 
@@ -124,34 +126,52 @@ listaReceitas.innerHTML = "";
         `;
     });
 }
-function excluirReceita(id) {
+async function excluirReceita(id) {
 
     if (!confirm("Deseja realmente excluir esta receita?")) {
         return;
     }
 
-    receitas = receitas.filter(
-        receita => receita.id !== id
-    );
+    const user = auth.currentUser;
 
-    atualizarResumo();
-    atualizarSaldo();
-    exibirReceitas();
+    if (!user) return;
 
-    if (typeof atualizarHistorico === "function") {
-        atualizarHistorico();
-    }
+    try {
 
-    if (typeof atualizarGrafico === "function") {
-        atualizarGrafico();
-    }
+        await deleteDoc(
+            doc(
+                db,
+                "usuarios",
+                user.uid,
+                "receitas",
+                id
+            )
+        );
 
-    if (typeof atualizarLancamentos === "function") {
-        atualizarLancamentos();
+        await atualizarResumo();
+        await exibirReceitas();
+
+        if (typeof atualizarHistorico === "function") {
+            atualizarHistorico();
+        }
+
+        if (typeof atualizarGrafico === "function") {
+            atualizarGrafico();
+        }
+
+        if (typeof atualizarLancamentos === "function") {
+            atualizarLancamentos();
+        }
+
+        alert("Receita excluída com sucesso!");
+
+    } catch (erro) {
+
+        console.error("Erro ao excluir receita:", erro);
+        alert("Erro ao excluir receita.");
+
     }
 }
-
-
 async function testarLeituraReceitas() {
 
     const user = auth.currentUser;
@@ -210,3 +230,4 @@ onAuthStateChanged(auth, async (user) => {
     await testarLeituraReceitas();
 
 });
+window.excluirReceita = excluirReceita;
