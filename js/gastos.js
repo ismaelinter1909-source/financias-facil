@@ -241,7 +241,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (!user) return;
 
-    console.log("Carregando gastos...");
+
 
     await atualizarGastos();
     await atualizarSaldo();

@@ -68,7 +68,7 @@ async function atualizarResumo() {
 
     });
 
-    console.log("TOTAL DASHBOARD:", totalReceitas);
+
 
     document.getElementById("totalReceitas").textContent =
         totalReceitas.toLocaleString("pt-BR", {
@@ -241,4 +241,3 @@ onAuthStateChanged(auth, async (user) => {
 window.excluirReceita = excluirReceita;
 window.exibirReceitas = exibirReceitas;
 window.atualizarResumo = atualizarResumo;
-console.log("Receitas carregado");

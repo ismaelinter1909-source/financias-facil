@@ -63,11 +63,11 @@ if (btnLogout) {
 }
 
 onAuthStateChanged(auth, (user) => {
-    console.log("USUÁRIO AUTH:", user);
+    le.log("USUÁRIO AUTH:", user);
 
     if (user) {
 
-        console.log("Usuário logado:", user.displayName);
+        
 
         testarFirestore(user);
 
@@ -112,7 +112,7 @@ async function testarFirestore(user) {
             }
         );
 
-        console.log("Firestore funcionando!");
+    
 
     } catch (erro) {
 

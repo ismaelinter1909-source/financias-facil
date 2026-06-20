@@ -86,9 +86,6 @@ async function atualizarLancamentos() {
         "totalLancamentos"
     ).textContent = totalReceitas + totalGastos;
 }
-console.log("Dashboard carregado");
-console.log("Dashboard carregado");
-
 import { onAuthStateChanged }
 from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
@@ -99,9 +96,3 @@ onAuthStateChanged(auth, async (user) => {
     await atualizarLancamentos();
 
 });
-console.log("atualizarGastos:", typeof atualizarGastos);
-console.log("atualizarSaldo:", typeof atualizarSaldo);
-console.log("exibirReceitas:", typeof exibirReceitas);
-console.log("exibirGastos:", typeof exibirGastos);
-console.log("atualizarHistorico:", typeof atualizarHistorico);
-console.log("atualizarGrafico:", typeof atualizarGrafico);

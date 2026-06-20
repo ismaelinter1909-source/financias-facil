@@ -5,7 +5,6 @@ import {
     getDocs
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-console.log("Gráfico carregado");
 
 let grafico;
 
