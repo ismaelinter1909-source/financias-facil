@@ -49,10 +49,12 @@ export async function loginGoogle() {
 export async function logout() {
     try {
         await signOut(auth);
+          location.reload();
     } catch (erro) {
         console.error("Erro ao sair:", erro);
     }
 }
+
 
 if (btnLogin) {
     btnLogin.addEventListener("click", loginGoogle);
@@ -60,10 +62,11 @@ if (btnLogin) {
 
 if (btnLogout) {
     btnLogout.addEventListener("click", logout);
+    
 }
 
 onAuthStateChanged(auth, (user) => {
-    le.log("USUÁRIO AUTH:", user);
+
 
     if (user) {
 

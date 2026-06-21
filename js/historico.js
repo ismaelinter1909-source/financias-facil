@@ -1,38 +1,75 @@
-function atualizarHistorico() {
+import { auth, db } from "./firebase.js";
+
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+async function atualizarHistorico() {
+
 
     const listaHistorico =
         document.getElementById("listaHistorico");
 
-    if (!listaHistorico) return;
+    if (!listaHistorico) {
+        
+        return;
+    }
+
+    const user = auth.currentUser;
+
+    if (!user) {
+        
+        return;
+    }
 
     const mesAtual =
         document.getElementById("mesSelecionado").value;
 
-    const receitas = (
-        JSON.parse(localStorage.getItem("receitas")) || []
-    )
-    .filter(receita =>
-        receita.data.startsWith(mesAtual)
-    )
-    .map(receita => ({
-        tipo: "receita",
-        data: receita.data,
-        descricao: receita.origem,
-        valor: receita.valor
-    }));
+    const snapshotReceitas = await getDocs(
+        collection(db, "usuarios", user.uid, "receitas")
+    );
+    
+    const snapshotGastos = await getDocs(
+        collection(db, "usuarios", user.uid, "gastos")
+    );
 
-    const gastos = (
-        JSON.parse(localStorage.getItem("gastos")) || []
-    )
-    .filter(gasto =>
-        gasto.data.startsWith(mesAtual)
-    )
-    .map(gasto => ({
-        tipo: "gasto",
-        data: gasto.data,
-        descricao: gasto.categoria,
-        valor: gasto.valor
-    }));
+    const receitas = [];
+
+    snapshotReceitas.forEach((doc) => {
+
+        const receita = doc.data();
+
+        if (receita.data.startsWith(mesAtual)) {
+
+            receitas.push({
+                tipo: "receita",
+                data: receita.data,
+                descricao: receita.origem,
+                valor: receita.valor
+            });
+
+        }
+
+    });
+
+    const gastos = [];
+
+    snapshotGastos.forEach((doc) => {
+
+        const gasto = doc.data();
+
+        if (gasto.data.startsWith(mesAtual)) {
+
+            gastos.push({
+                tipo: "gasto",
+                data: gasto.data,
+                descricao: gasto.categoria,
+                valor: gasto.valor
+            });
+
+        }
+
+    });
 
     const movimentos = [
         ...receitas,
@@ -44,12 +81,11 @@ function atualizarHistorico() {
     );
 
     listaHistorico.innerHTML = "";
-
+   
     if (movimentos.length === 0) {
 
-        listaHistorico.innerHTML = `
-            <p>Nenhum lançamento encontrado para este mês.</p>
-        `;
+        listaHistorico.innerHTML =
+            "<p>Nenhum lançamento encontrado para este mês.</p>";
 
         return;
     }
@@ -68,11 +104,9 @@ function atualizarHistorico() {
 
         listaHistorico.innerHTML += `
             <div class="item-historico ${classe}">
-
                 <p>
                     <strong>
-                        ${new Date(item.data)
-                            .toLocaleDateString("pt-BR")}
+                        ${new Date(item.data).toLocaleDateString("pt-BR")}
                     </strong>
                 </p>
 
@@ -86,12 +120,24 @@ function atualizarHistorico() {
                         currency: "BRL"
                     })}
                 </p>
-
             </div>
         `;
     });
 
 }
-
 atualizarHistorico();
 window.atualizarHistorico = atualizarHistorico;
+
+
+window.atualizarHistorico = atualizarHistorico;
+
+import { onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+onAuthStateChanged(auth, async (user) => {
+
+    if (!user) return;
+
+    await atualizarHistorico();
+
+});
