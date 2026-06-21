@@ -168,6 +168,12 @@
                 <option>Carro</option>
                 <option>Mercado</option>
                 <option>Farmácia</option>
+                <option>Saúde</option>
+                <option>Educação</option>
+                <option>Transporte</option>
+                <option>Assinaturas</option>
+                <option>Restaurante</option>
+                <option>Consultas</option>
                 <option>Água</option>
                 <option>Luz</option>
                 <option>Internet</option>
@@ -180,6 +186,15 @@
             </select>
 
         </div>
+        <div>
+    <label>Descrição:</label>
+
+    <input
+        type="text"
+        id="descricaoGasto"
+        placeholder="Ex: Óculos, Mercado Atacadão, Netflix..."
+    >
+</div>
 
         <div>
             <label>Pagamento:</label>
@@ -190,7 +205,23 @@
                 <option>Débito</option>
                 <option>Crédito</option>
                 <option>Dinheiro</option>
+                <option>Vale-Alimentação</option>
+                <option>Vale-Refeição</option>
+                <option>Crediário</option>
             </select>
+            <div id="parcelamentoContainer" style="display:none;">
+
+            <label>Quantidade de Parcelas</label>
+
+            <input
+                type="number"
+                id="quantidadeParcelas"
+                min="2"
+                value="2"
+            >
+
+        </div>
+                
 
         </div>
 

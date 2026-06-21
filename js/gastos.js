@@ -1,3 +1,4 @@
+
 import { auth, db } from "./firebase.js";
 
 import {
@@ -7,41 +8,71 @@ import {
     deleteDoc,
     doc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
- 
 
 const formGasto =
     document.getElementById("formGasto");
 
 formGasto.addEventListener("submit", async function(event) {
-
+    
     event.preventDefault();
 
     const gasto = {
+
     id: Date.now(),
 
     data: document.getElementById("dataGasto").value,
     categoria: document.getElementById("categoriaGasto").value,
+    descricao: document.getElementById("descricaoGasto").value,
+
     pagamento: document.getElementById("pagamentoGasto").value,
-    valor: Number(document.getElementById("valorGasto").value)
+
+    valor: Number(
+        document.getElementById("valorGasto").value
+    ),
+
+    parcelas: Number(
+        document.getElementById("quantidadeParcelas")?.value || 1
+    )
+
 };
+
     const user = auth.currentUser;
- if (!user) {
+
+if (!user) {
     alert("Usuário não logado.");
     return;
- }
+}
+
+for (let i = 0; i < gasto.parcelas; i++) {
+
+    const dataParcela = new Date(gasto.data);
+
+    dataParcela.setMonth(
+        dataParcela.getMonth() + i
+    );
 
     await addDoc(
         collection(db, "usuarios", user.uid, "gastos"),
-        gasto
+        {
+            ...gasto,
+
+            data: dataParcela
+                .toISOString()
+                .split("T")[0],
+
+            parcelaAtual: i + 1,
+
+            totalParcelas: gasto.parcelas
+        }
     );
+}
 
-    alert("Gasto salvo com sucesso!");
-
+alert("Gasto salvo com sucesso!");
     formGasto.reset();
 
     await atualizarGastos();
-await atualizarSaldo();
-await exibirGastos();
+    await atualizarSaldo();
+    await exibirGastos();
 
 if (typeof atualizarLancamentos === "function") {
     await atualizarLancamentos();
@@ -167,9 +198,14 @@ async function atualizarSaldo() {
                 <p><strong>Categoria:</strong>
                 ${gasto.categoria}</p>
 
+                <p><strong>Descrição:</strong>
+                ${gasto.descricao || 'N/A'}</p>
+
                 <p><strong>Pagamento:</strong>
                 ${gasto.pagamento}</p>
-
+                <p><strong>Parcelas:</strong>
+                ${gasto.parcelas || 1}x</p>
+               
                 <p><strong>Valor:</strong>
                 ${gasto.valor.toLocaleString('pt-BR', {
                     style: 'currency',
@@ -183,6 +219,7 @@ async function atualizarSaldo() {
                  </button>
 
             </div>
+            
         `;
     });
 }
@@ -251,3 +288,28 @@ onAuthStateChanged(auth, async (user) => {
 window.atualizarGastos = atualizarGastos;
 window.atualizarSaldo = atualizarSaldo;
 window.exibirGastos = exibirGastos;
+
+const pagamento =
+    document.getElementById("pagamentoGasto");
+
+const parcelamentoContainer =
+    document.getElementById("parcelamentoContainer");
+
+pagamento.addEventListener("change", () => {
+
+    if (
+        pagamento.value === "Crédito" ||
+        pagamento.value === "Crediário"
+    ) {
+
+        parcelamentoContainer.style.display =
+            "block";
+
+    } else {
+
+        parcelamentoContainer.style.display =
+            "none";
+
+    }
+
+});
