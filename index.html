@@ -7,6 +7,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
     <link rel="stylesheet" href="styles.css">
     <title>Finanças</title>
 </head>
@@ -226,4 +228,23 @@
 
 <script src="js/backup.js"></script>
 <script type="module" src="js/firebase.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", () => {
+
+        navigator.serviceWorker
+            .register("./service-worker.js")
+            .then(() => {
+                console.log("Service Worker registrado");
+            })
+            .catch((erro) => {
+                console.error("Erro Service Worker:", erro);
+            });
+
+    });
+
+}
+</script>
+</body>
 </html>
