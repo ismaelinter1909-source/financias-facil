@@ -1,7 +1,8 @@
 {
+  "id": "/",
   "name": "Finanças Fácil",
   "short_name": "Finanças",
-  "start_url": "./index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2c3e50",
@@ -16,6 +17,14 @@
       "src": "img/logo-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "img/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ]
 }
