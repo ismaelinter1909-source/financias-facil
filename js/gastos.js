@@ -6,7 +6,9 @@ import {
     getDocs,
     addDoc,
     deleteDoc,
-    doc
+    doc,
+    query,
+    where
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const formGasto =
@@ -42,6 +44,7 @@ if (!user) {
     alert("Usuário não logado.");
     return;
 }
+const compraId = Date.now().toString();
 
 for (let i = 0; i < gasto.parcelas; i++) {
 
@@ -55,6 +58,9 @@ for (let i = 0; i < gasto.parcelas; i++) {
         collection(db, "usuarios", user.uid, "gastos"),
         {
             ...gasto,
+
+
+            compraId: compraId,
 
             data: dataParcela
                 .toISOString()
@@ -214,7 +220,7 @@ async function atualizarSaldo() {
 
                  <button
             class="btn-excluir"
-            onclick="excluirGasto('${gasto.firestoreId}')">
+            onclick="excluirGasto('${gasto.firestoreId}','${gasto.compraId || ""}')"
             Excluir
                  </button>
 
@@ -223,7 +229,9 @@ async function atualizarSaldo() {
         `;
     });
 }
-async function excluirGasto(id) {
+async function excluirGasto(id, compraId) {
+    console.log("ID:", id);
+console.log("CompraID:", compraId);
 
     if (!confirm("Deseja realmente excluir este gasto?")) {
         return;
@@ -235,15 +243,41 @@ async function excluirGasto(id) {
 
     try {
 
+       if (compraId) {
+
+    const q = query(
+        collection(db, "usuarios", user.uid, "gastos"),
+        where("compraId", "==", compraId)
+    );
+
+    const snapshot = await getDocs(q);
+
+    for (const documento of snapshot.docs) {
+
         await deleteDoc(
             doc(
                 db,
                 "usuarios",
                 user.uid,
                 "gastos",
-                id
+                documento.id
             )
         );
+    }
+
+} else {
+
+    await deleteDoc(
+        doc(
+            db,
+            "usuarios",
+            user.uid,
+            "gastos",
+            id
+        )
+    );
+
+}
 
         await atualizarGastos();
         await atualizarSaldo();
