@@ -8,8 +8,12 @@ import {
     deleteDoc,
     doc,
     query,
-    where
+    where,
+    getDoc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+let gastoEditando = null;
 
 const formGasto =
     document.getElementById("formGasto");
@@ -209,8 +213,8 @@ async function atualizarSaldo() {
 
                 <p><strong>Pagamento:</strong>
                 ${gasto.pagamento}</p>
-                <p><strong>Parcelas:</strong>
-                ${gasto.parcelas || 1}x</p>
+                <p><strong>Parcela:</strong>
+            ${gasto.parcelaAtual || 1}/${gasto.totalParcelas || gasto.parcelas || 1}</p>
                
                 <p><strong>Valor:</strong>
                 ${gasto.valor.toLocaleString('pt-BR', {
@@ -219,9 +223,14 @@ async function atualizarSaldo() {
                 })}</p>
 
                  <button
-            class="btn-excluir"
-            onclick="excluirGasto('${gasto.firestoreId}','${gasto.compraId || ""}')"
-            Excluir
+                    class="btn-excluir"
+                    onclick="excluirGasto('${gasto.firestoreId}','${gasto.compraId || ""}')"
+                    Excluir
+                 </button>
+                 <button
+                    class="btn-editar"
+                    onclick="editarGasto('${gasto.firestoreId}')">
+                    Editar
                  </button>
 
             </div>
@@ -304,7 +313,59 @@ console.log("CompraID:", compraId);
 
     }
 }
+async function editarGasto(id) {
+
+    const user = auth.currentUser;
+
+    if (!user) return;
+
+    const docRef = doc(
+        db,
+        "usuarios",
+        user.uid,
+        "gastos",
+        id
+    );
+
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+        alert("Gasto não encontrado.");
+        return;
+    }
+
+    const gasto = docSnap.data();
+
+    document.getElementById("dataGasto").value =
+        gasto.data || "";
+
+    document.getElementById("categoriaGasto").value =
+        gasto.categoria || "";
+
+    document.getElementById("descricaoGasto").value =
+        gasto.descricao || "";
+
+    document.getElementById("pagamentoGasto").value =
+        gasto.pagamento || "";
+
+    document.getElementById("valorGasto").value =
+        gasto.valor || "";
+
+    if (gasto.parcelas) {
+        document.getElementById("quantidadeParcelas").value =
+            gasto.parcelas;
+    }
+
+    gastoEditando = id;
+
+    document.querySelector(
+        "#formGasto button[type='submit']"
+    ).textContent = "Atualizar Gasto";
+
+}
+
 window.excluirGasto = excluirGasto;
+window.editarGasto = editarGasto;
 import { onAuthStateChanged }
 from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 

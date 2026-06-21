@@ -21,6 +21,10 @@ if (typeof atualizarResumo === "function") {
 }
     await atualizarGastos();
     await atualizarSaldo();
+    
+     if (typeof atualizarContasPagar === "function") {
+        await atualizarContasPagar();
+    }
 
     if (typeof exibirReceitas === "function") {
         await exibirReceitas();

@@ -42,6 +42,9 @@
     <button onclick="mostrarSecao('gastos')">
         Gastos
     </button>
+    <button onclick="mostrarSecao('contasPagar')">
+    Contas a Pagar
+    </button>
 
     <button onclick="mostrarSecao('historico')">
         Histórico
@@ -95,6 +98,15 @@
         <h3>Saldo</h3>
         <p id="saldoAtual">R$ 0,00</p>
     </div>
+  <div class="card contas-pagar">
+    <h3>Contas a Pagar</h3>
+    <p id="totalContasPagar">R$ 0,00</p>
+</div>
+
+<div class="card saldo-projetado">
+    <h3>Saldo Projetado</h3>
+    <p id="saldoProjetado">R$ 0,00</p>
+</div>
 
     <div class="card lancamentos">
         <h3>Lançamentos</h3>
@@ -239,6 +251,13 @@
     <div id="listaGastos"></div>
 
 </section>
+<section id="contasPagar">
+
+    <h2>Contas a Pagar</h2>
+
+    <div id="listaContasPagar"></div>
+
+</section>
 
 <section id="historico">
 
@@ -248,6 +267,7 @@
 
 </section>
 
+
 </main>
 <script type="module" src="js/dashboard.js"></script>
 <script type="module" src="js/app.js"></script>
@@ -256,6 +276,7 @@
 <script type="module" src="js/historico.js"></script>
 <script type="module" src="js/grafico.js"></script>
 <script type="module" src="js/relatorio.js"></script>
+<script type="module" src="js/contasPagar.js"></script>
 
 <script src="js/backup.js"></script>
 <script type="module" src="js/firebase.js"></script>
