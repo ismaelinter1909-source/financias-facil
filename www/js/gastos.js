@@ -223,11 +223,12 @@ async function atualizarSaldo() {
                 })}</p>
 
                  <button
-                    class="btn-excluir"
-                    onclick="excluirGasto('${gasto.firestoreId}','${gasto.compraId || ""}')"
-                    Excluir
-                 </button>
-                 <button
+                        class="btn-excluir"
+                        onclick="excluirGasto('${gasto.firestoreId}','${gasto.compraId || ""}')"
+                        title="Excluir">
+                          🗑️
+                </button>
+                <button
                     class="btn-editar"
                     onclick="editarGasto('${gasto.firestoreId}')">
                     Editar

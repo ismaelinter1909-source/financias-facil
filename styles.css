@@ -289,17 +289,14 @@ form button:hover {
 }
 
 .btn-excluir {
-    background-color: #e74c3c;
+    background: #e74c3c;
     color: white;
     border: none;
-    padding: 8px 15px;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-top: 8px;
-    min-width: 90px;
-    font-weight: bold;
+    font-size: 14px;
 }
-
 .btn-editar {
     background-color: #3498db;
     color: white;
