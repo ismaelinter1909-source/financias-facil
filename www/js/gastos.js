@@ -398,14 +398,13 @@ pagamento.addEventListener("change", () => {
         pagamento.value === "Crediário"
     ) {
 
-        parcelamentoContainer.style.display =
-            "block";
+        parcelamentoContainer.style.display = "block";
 
     } else {
 
-        parcelamentoContainer.style.display =
-            "none";
+        parcelamentoContainer.style.display = "none";
 
+        document.getElementById("quantidadeParcelas").value = 1;
     }
 
 });
