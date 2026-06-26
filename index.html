@@ -15,8 +15,12 @@
 </head>
 <body>
     <header class="topo">
-    <img src="img/APP-FINANCIAS-FACIL.png" alt="Finanças Fácil" class="logo">
-    <h1>Finanças Fácil</h1>
+
+    <div class="titulo-app">
+        <h1>Finanças Fácil</h1>
+        <p>Controle Financeiro Pessoal</p>
+    </div>
+
 </header>
 <div id="areaUsuario" style="text-align:center; margin:10px;">
     <button id="btnLoginGoogle">
@@ -26,10 +30,13 @@
     🚪 Sair
 </button>
 
-<h3 id="nomeUsuario"></h3>
+<div class="usuario">
 
-    <h3 id="nomeUsuario"></h3>
+    <h2 id="nomeUsuario"></h2>
 
+    <span id="dataHoje"></span>
+
+</div>
 
 <main>
 
@@ -43,6 +50,15 @@
     </label>
 
     <input type="month" id="mesSelecionado">
+    <div class="saldo-principal">
+
+    <span>Saldo Atual</span>
+
+    <h1 id="saldoAtualGrande">
+        R$ 0,00
+    </h1>
+
+</div>
 
 </div>
 
