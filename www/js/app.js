@@ -11,4 +11,3 @@ function mostrarSecao(secaoId) {
 
 mostrarSecao("dashboard");
 window.mostrarSecao = mostrarSecao;
-window.formatarData = formatarData;

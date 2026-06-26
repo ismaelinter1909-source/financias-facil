@@ -52,7 +52,7 @@ const compraId = Date.now().toString();
 
 for (let i = 0; i < gasto.parcelas; i++) {
 
-    const dataParcela = new Date(gasto.data + "T12:00:00");
+    const dataParcela = new Date(gasto.data);
 
     dataParcela.setMonth(
         dataParcela.getMonth() + i
@@ -202,8 +202,10 @@ async function atualizarSaldo() {
             <div class="item-gasto">
 
                 <p><strong>Data:</strong>
-               ${formatarData(gasto.data)}</p>
+                ${new Date(gasto.data)
+                    .toLocaleDateString('pt-BR')}</p>
 
+                <p><strong>Categoria:</strong>
                 ${gasto.categoria}</p>
 
                 <p><strong>Descrição:</strong>
@@ -221,12 +223,11 @@ async function atualizarSaldo() {
                 })}</p>
 
                  <button
-                        class="btn-excluir"
-                        onclick="excluirGasto('${gasto.firestoreId}','${gasto.compraId || ""}')"
-                        title="Excluir">
-                          🗑️
-                </button>
-                <button
+    class="btn-excluir"
+    onclick="excluirGasto('${gasto.firestoreId}','${gasto.compraId || ""}')">
+    🗑️ Excluir
+</button>
+                 <button
                     class="btn-editar"
                     onclick="editarGasto('${gasto.firestoreId}')">
                     Editar
@@ -383,32 +384,26 @@ window.atualizarGastos = atualizarGastos;
 window.atualizarSaldo = atualizarSaldo;
 window.exibirGastos = exibirGastos;
 
-const quantidadeParcelas =
-    document.getElementById("quantidadeParcelas");
+const pagamento =
+    document.getElementById("pagamentoGasto");
+
+const parcelamentoContainer =
+    document.getElementById("parcelamentoContainer");
 
 pagamento.addEventListener("change", () => {
 
-    if (pagamento.value === "Crédito") {
+    if (
+        pagamento.value === "Crédito" ||
+        pagamento.value === "Crediário"
+    ) {
 
-        parcelamentoContainer.style.display = "block";
-
-        quantidadeParcelas.options[0].style.display = "block";
-        quantidadeParcelas.value = "1";
-
-    } else if (pagamento.value === "Crediário") {
-
-        parcelamentoContainer.style.display = "block";
-
-        quantidadeParcelas.options[0].style.display = "none";
-
-        if (quantidadeParcelas.value === "1") {
-            quantidadeParcelas.value = "2";
-        }
+        parcelamentoContainer.style.display =
+            "block";
 
     } else {
 
-        parcelamentoContainer.style.display = "none";
-        quantidadeParcelas.value = "1";
+        parcelamentoContainer.style.display =
+            "none";
 
     }
 

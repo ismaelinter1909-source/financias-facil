@@ -54,7 +54,7 @@ async function atualizarContasPagar() {
 
                 <p>
                     Data:
-                    ${formatarData(gasto.data)}
+                    ${dataParcela.toLocaleDateString("pt-BR")}
                 </p>
 
                 <p>
