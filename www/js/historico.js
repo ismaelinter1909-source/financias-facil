@@ -106,7 +106,7 @@ async function atualizarHistorico() {
             <div class="item-historico ${classe}">
                 <p>
                     <strong>
-                        ${new Date(item.data).toLocaleDateString("pt-BR")}
+                        ${formatarData(item.data)}
                     </strong>
                 </p>
 
