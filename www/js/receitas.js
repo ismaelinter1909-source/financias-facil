@@ -113,8 +113,7 @@ listaReceitas.innerHTML = "";
         listaReceitas.innerHTML += `
             <div class="item-receita">
                 <p><strong>Data:</strong>
-                ${new Date(receita.data)
-                    .toLocaleDateString('pt-BR')}</p>
+                ${formatarData(receita.data)}</p>
 
                 <p><strong>Origem:</strong>
                 ${receita.origem}</p>

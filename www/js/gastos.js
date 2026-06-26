@@ -52,7 +52,7 @@ const compraId = Date.now().toString();
 
 for (let i = 0; i < gasto.parcelas; i++) {
 
-    const dataParcela = new Date(gasto.data);
+    const dataParcela = new Date(gasto.data + "T12:00:00");
 
     dataParcela.setMonth(
         dataParcela.getMonth() + i
@@ -202,10 +202,8 @@ async function atualizarSaldo() {
             <div class="item-gasto">
 
                 <p><strong>Data:</strong>
-                ${new Date(gasto.data)
-                    .toLocaleDateString('pt-BR')}</p>
+               ${formatarData(gasto.data)}</p>
 
-                <p><strong>Categoria:</strong>
                 ${gasto.categoria}</p>
 
                 <p><strong>Descrição:</strong>
@@ -385,26 +383,33 @@ window.atualizarGastos = atualizarGastos;
 window.atualizarSaldo = atualizarSaldo;
 window.exibirGastos = exibirGastos;
 
-const pagamento =
-    document.getElementById("pagamentoGasto");
-
-const parcelamentoContainer =
-    document.getElementById("parcelamentoContainer");
+const quantidadeParcelas =
+    document.getElementById("quantidadeParcelas");
 
 pagamento.addEventListener("change", () => {
 
-    if (
-        pagamento.value === "Crédito" ||
-        pagamento.value === "Crediário"
-    ) {
+    if (pagamento.value === "Crédito") {
 
         parcelamentoContainer.style.display = "block";
+
+        quantidadeParcelas.options[0].style.display = "block";
+        quantidadeParcelas.value = "1";
+
+    } else if (pagamento.value === "Crediário") {
+
+        parcelamentoContainer.style.display = "block";
+
+        quantidadeParcelas.options[0].style.display = "none";
+
+        if (quantidadeParcelas.value === "1") {
+            quantidadeParcelas.value = "2";
+        }
 
     } else {
 
         parcelamentoContainer.style.display = "none";
+        quantidadeParcelas.value = "1";
 
-        document.getElementById("quantidadeParcelas").value = 1;
     }
 
 });
