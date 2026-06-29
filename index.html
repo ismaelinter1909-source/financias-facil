@@ -15,12 +15,10 @@
 </head>
 <body>
     <header class="topo">
-
-    <div class="titulo-app">
+     <div class="titulo-app">
         <h1>Finanças Fácil</h1>
         <p>Controle Financeiro Pessoal</p>
     </div>
-
 </header>
 <div id="areaUsuario" style="text-align:center; margin:10px;">
     <button id="btnLoginGoogle">
@@ -30,13 +28,10 @@
     🚪 Sair
 </button>
 
-<div class="usuario">
+<h3 id="nomeUsuario"></h3>
 
-    <h2 id="nomeUsuario"></h2>
+    <h3 id="nomeUsuario"></h3>
 
-    <span id="dataHoje"></span>
-
-</div>
 
 <main>
 
@@ -50,15 +45,6 @@
     </label>
 
     <input type="month" id="mesSelecionado">
-    <div class="saldo-principal">
-
-    <span>Saldo Atual</span>
-
-    <h1 id="saldoAtual">
-        R$ 0,00
-    </h1>
-
-</div>
 
 </div>
 
@@ -76,7 +62,10 @@
         <p id="totalGastos">R$ 0,00</p>
     </div>
 
-
+    <div class="card saldo">
+        <h3>Saldo</h3>
+        <p id="saldoAtual">R$ 0,00</p>
+    </div>
   <div class="card contas-pagar">
     <h3>Contas a Pagar</h3>
     <p id="totalContasPagar">R$ 0,00</p>
@@ -319,9 +308,9 @@
         <small>Historico</small>
     </button>
 
-     <button onclick="mostrarSecao('contasPagar')">
+     <button onclick="mostrarSecao('gastos')">
         <span class="material-symbols-outlined">credit_card</span>
-        <small>Contas a Pagar</small>
+        <small>C</small>
     </button>
 
 <script type="module" src="js/dashboard.js"></script>
